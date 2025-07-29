@@ -27,7 +27,7 @@ def get_visit_pts(mimic4_path:str, group_col:str, visit_col:str, admit_col:str, 
 
     visit = None # df containing visit information depending on using ICU or not
     if use_ICU:
-        visit = pd.read_csv(mimic4_path + "icu/icustays.csv.gz", compression='gzip', header=0, index_col=None, parse_dates=[admit_col, disch_col])
+        visit = pd.read_csv(os.path.join(mimic4_path, "icu", "icustays.csv.gz"), compression='gzip', header=0, index_col=None, parse_dates=[admit_col, disch_col])
         if use_admn:
             # icustays doesn't have a way to identify if patient died during visit; must
             # use core/patients to remove such stay_ids for readmission labels
@@ -61,7 +61,7 @@ def get_visit_pts(mimic4_path:str, group_col:str, visit_col:str, admit_col:str, 
                 print("[ READMISSION DUE TO "+disease_label+" ]")
 
     pts = pd.read_csv(
-            mimic4_path + "hosp/patients.csv.gz", compression='gzip', header=0, index_col = None, usecols=[group_col, 'anchor_year', 'anchor_age', 'anchor_year_group', 'dod','gender']
+            os.path.join(mimic4_path, "hosp", "patients.csv.gz"), compression='gzip', header=0, index_col = None, usecols=[group_col, 'anchor_year', 'anchor_age', 'anchor_year_group', 'dod','gender']
         )
     pts['yob']= pts['anchor_year'] - pts['anchor_age']  # get yob to ensure a given visit is from an adult
     pts['min_valid_year'] = pts['anchor_year'] + (2019 - pts['anchor_year_group'].str.slice(start=-4).astype(int))
@@ -85,7 +85,7 @@ def get_visit_pts(mimic4_path:str, group_col:str, visit_col:str, admit_col:str, 
     visit_pts = visit_pts.loc[visit_pts['Age'] >= 18]
     
     ##Add Demo data
-    eth = pd.read_csv(mimic4_path + "hosp/admissions.csv.gz", compression='gzip', header=0, usecols=['hadm_id', 'insurance','race'], index_col=None)
+    eth = pd.read_csv(os.path.join(mimic4_path, "hosp", "admissions.csv.gz"), compression='gzip', header=0, usecols=['hadm_id', 'insurance','race'], index_col=None)
     visit_pts= visit_pts.merge(eth, how='inner', left_on='hadm_id', right_on='hadm_id')
     
     if use_ICU:
@@ -307,7 +307,7 @@ def extract_data(use_ICU:str, label:str, time:int, icd_code:str, root_dir, disea
         death_col='dod'
 
     pts = get_visit_pts(
-        mimic4_path=root_dir+"/mimiciv/3.1/",
+        mimic4_path=os.path.join(root_dir, "mimiciv", "3.1"),
         group_col=group_col,
         visit_col=visit_col,
         admit_col=admit_col,

@@ -2,8 +2,10 @@ mimic-iv-1.0
 scrap
 *.gzip
 *.csv.gz
+*.csv
 *summary*.txt
 mimiciv
+data
 
 .ipynb_checkpoints/
 
